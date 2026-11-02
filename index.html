@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#171123" />
+  <meta name="description" content="A special birthday surprise just for you 💜" />
+  <title>For Chokkii 💜</title>
+
+  <!-- Heart emoji favicon via SVG data URI -->
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💜</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ══════════════════════════════════════════════
+       FLOATING MUSIC BUTTON
+  ══════════════════════════════════════════════ -->
+  <button id="music-btn" class="music-btn" aria-label="Toggle background music" title="Toggle music">
+    🎵
+  </button>
+  <audio id="bg-audio" src="audio/alex-morgan-melody-so-melody-545531.mp3" loop preload="auto"></audio>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN 1: LOADING + COUNTDOWN
+  ══════════════════════════════════════════════ -->
+  <section id="screen-loading" class="screen screen--loading active">
+    <!-- Floating background particles -->
+    <div class="particles" id="loading-particles" aria-hidden="true"></div>
+
+    <!-- Loading phase -->
+    <div id="loading-phase" class="loading-phase">
+      <div class="loading-letters" id="loading-letters" aria-label="ACCHUUU"></div>
+      <div class="loading-heart" aria-hidden="true">💜</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <!-- Countdown phase (hidden until loading done) -->
+    <div id="countdown-phase" class="countdown-phase hidden">
+      <p class="countdown-caption">Something special is waiting for you…</p>
+      <div class="countdown-grid" role="timer" aria-live="polite" aria-label="Countdown timer">
+        <div class="countdown-card">
+          <span class="countdown-value" id="cd-days">00</span>
+          <span class="countdown-label">Days</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-card">
+          <span class="countdown-value" id="cd-hours">00</span>
+          <span class="countdown-label">Hours</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-card">
+          <span class="countdown-value" id="cd-mins">00</span>
+          <span class="countdown-label">Mins</span>
+        </div>
+        <span class="countdown-sep" aria-hidden="true">:</span>
+        <div class="countdown-card">
+          <span class="countdown-value" id="cd-secs">00</span>
+          <span class="countdown-label">Secs</span>
+        </div>
+      </div>
+      <p class="countdown-sub">Mark your calendar 🗓️</p>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN 2: BIRTHDAY GREETING
+  ══════════════════════════════════════════════ -->
+  <section id="screen-birthday" class="screen screen--birthday hidden">
+    <div class="particles" id="bday-particles" aria-hidden="true"></div>
+    <div class="balloons-container" id="balloons" aria-hidden="true"></div>
+
+    <div class="bday-content">
+      <div class="bday-cake" aria-hidden="true">🎂</div>
+      <h1 class="bday-heading">HAPPIEST BIRTHDAY<br />CHOKKIII 😍</h1>
+      <p class="bday-sub">Today is ALL about you, my love ✨</p>
+      <button id="continue-btn" class="btn btn--primary" aria-label="Continue to next screen">
+        tap to continue 💜
+      </button>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN 3: "DO YOU LOVE ME?"
+  ══════════════════════════════════════════════ -->
+  <section id="screen-love" class="screen screen--love hidden">
+    <div class="particles" id="love-particles" aria-hidden="true"></div>
+
+    <div class="love-content">
+      <div class="love-emoji" aria-hidden="true">🥰</div>
+      <h2 class="love-heading">Do you love me?</h2>
+
+      <div class="love-buttons">
+        <button class="btn btn--love" id="btn-yes" data-answer="yes" aria-label="Yes I love you">
+          YES 💜
+        </button>
+        <button class="btn btn--love" id="btn-yes-more" data-answer="yes-more" aria-label="Yes I love you even more">
+          YES MORE 💜💜
+        </button>
+      </div>
+
+      <p class="love-cheeky">You don't have a NO option 😂 HAHA</p>
+
+      <!-- Scroll hint (shown after love answer) -->
+      <div class="scroll-hint hidden" id="scroll-hint" aria-label="Scroll down for more">
+        <span class="scroll-arrow" aria-hidden="true">⬇️</span>
+        <span>scroll down</span>
+      </div>
+    </div>
+
+    <!-- Heart explosion overlay -->
+    <div id="love-overlay" class="love-overlay hidden" role="dialog" aria-modal="true" aria-label="Love message">
+      <div class="love-popup">
+        <div class="love-popup-hearts" aria-hidden="true" id="popup-hearts"></div>
+        <p class="love-popup-text">LOVE YOUUU TOO<br />ALAHII 💜</p>
+        <button class="btn btn--primary love-popup-close" id="close-overlay" aria-label="Close message">
+          Awww 🥰
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       SCREEN 4: MEMORY VIDEOS
+  ══════════════════════════════════════════════ -->
+  <section id="screen-videos" class="screen screen--videos hidden">
+    <div class="videos-header">
+      <h2 class="videos-heading">Our Precious Moments 🎥💜</h2>
+      <p class="videos-sub">Every memory with you is my favourite 🌸</p>
+    </div>
+
+    <div class="video-cards" id="video-cards">
+      <!-- Video cards injected by JS from CONFIG -->
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════
+       FINAL SCREEN
+  ══════════════════════════════════════════════ -->
+  <section id="screen-final" class="screen screen--final hidden">
+    <div class="particles" id="final-particles" aria-hidden="true"></div>
+    <div class="final-content">
+      <div class="final-emoji" aria-hidden="true">😂</div>
+      <h2 class="final-heading">SARINGOOOW<br />MADAM JII 😂</h2>
+      <p class="final-sub">CRINGE MUDICHII 😂</p>
+      <p class="final-love">But you know I mean every word 💜</p>
+      <button class="btn btn--primary" id="replay-btn" aria-label="Replay from the beginning">
+        Replay 🔁
+      </button>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,877 @@
+/* ════════════════════════════════════════════════════════════
+   BIRTHDAY SURPRISE — style.css
+   Color Palette (CSS Variables):
+     --col-primary   #6F2DBD  ~50% — gradients, buttons, glows
+     --col-secondary #A663CC  ~30% — accents, borders, secondary gradient
+     --col-dark      #171123  ~10% — backgrounds, dark text
+     --col-light     #FBFBFB  ~10% — text on dark, cards
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 1. CSS VARIABLES ───────────────────────────────────────── */
+:root {
+  --col-primary:   #6F2DBD;
+  --col-secondary: #A663CC;
+  --col-dark:      #171123;
+  --col-light:     #FBFBFB;
+
+  --gradient-main:    linear-gradient(135deg, #6F2DBD 0%, #A663CC 100%);
+  --gradient-radial:  radial-gradient(ellipse at 60% 40%, #6F2DBD 0%, #171123 70%);
+  --gradient-card:    linear-gradient(145deg, rgba(111,45,189,0.25), rgba(166,99,204,0.15));
+
+  --glow-primary:   0 0 24px rgba(111, 45, 189, 0.7), 0 0 60px rgba(111, 45, 189, 0.35);
+  --glow-secondary: 0 0 16px rgba(166, 99, 204, 0.6);
+  --glow-soft:      0 0 40px rgba(111, 45, 189, 0.25);
+
+  --radius-card: 20px;
+  --radius-btn:  999px;
+  --font-body:   'Poppins', sans-serif;
+  --font-head:   'Dancing Script', cursive;
+
+  --transition-fast:   0.2s ease;
+  --transition-smooth: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── 2. RESET & BASE ────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--col-dark);
+  color: var(--col-light);
+  overflow-x: hidden;
+  /* Prevent horizontal scroll */
+  max-width: 100vw;
+  /* Safe area for notched phones */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── 3. SCREEN SYSTEM ───────────────────────────────────────── */
+.screen {
+  min-height: 100dvh; /* dynamic viewport height for mobile */
+  width: 100%;
+  max-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px 20px;
+  padding-top: max(24px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.screen.hidden {
+  display: none !important;
+}
+
+.screen.active {
+  display: flex;
+}
+
+/* Screen transition animation */
+.screen--fade-in {
+  animation: screenFadeIn 0.8s var(--transition-smooth) forwards;
+}
+
+@keyframes screenFadeIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Flash overlay for countdown→birthday transition */
+#flash-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--col-light);
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0;
+}
+
+#flash-overlay.flash {
+  animation: flashAnim 0.6s ease-out forwards;
+}
+
+@keyframes flashAnim {
+  0%   { opacity: 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ── 4. PARTICLES BACKGROUND ───────────────────────────────── */
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  font-size: clamp(12px, 3vw, 22px);
+  opacity: 0;
+  user-select: none;
+  will-change: transform, opacity;
+  animation: floatParticle linear infinite;
+}
+
+@keyframes floatParticle {
+  0%   { transform: translateY(110vh) rotate(0deg);   opacity: 0; }
+  10%  { opacity: 0.85; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+/* ── 5. MUSIC BUTTON ────────────────────────────────────────── */
+.music-btn {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  right: 20px;
+  z-index: 999;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid var(--col-secondary);
+  background: rgba(23, 17, 35, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-secondary);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  line-height: 1;
+}
+
+.music-btn:hover,
+.music-btn:focus-visible {
+  transform: scale(1.1);
+  box-shadow: var(--glow-primary);
+  outline: none;
+}
+
+.music-btn.playing {
+  animation: musicPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes musicPulse {
+  0%, 100% { box-shadow: var(--glow-secondary); }
+  50%       { box-shadow: var(--glow-primary); }
+}
+
+/* ── 6. SCREEN 1: LOADING ───────────────────────────────────── */
+.screen--loading {
+  background: var(--gradient-radial);
+}
+
+/* Loading letters */
+.loading-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.loading-letters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.loading-letter {
+  font-family: var(--font-head);
+  font-size: clamp(32px, 10vw, 56px);
+  color: var(--col-light);
+  text-shadow: var(--glow-primary);
+  opacity: 0;
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.loading-letter.animate {
+  animation: letterBounce 0.6s var(--transition-spring) forwards;
+}
+
+@keyframes letterBounce {
+  0%   { opacity: 0; transform: translateY(40px) scale(0.5); }
+  60%  { opacity: 1; transform: translateY(-10px) scale(1.15); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.loading-heart {
+  font-size: 52px;
+  animation: heartbeat 1.2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14%       { transform: scale(1.2); }
+  28%       { transform: scale(1); }
+  42%       { transform: scale(1.15); }
+  56%       { transform: scale(1); }
+}
+
+/* Progress bar */
+.progress-bar-wrap {
+  width: min(280px, 75vw);
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: var(--gradient-main);
+  box-shadow: var(--glow-secondary);
+  transition: width 0.05s linear;
+}
+
+/* ── 7. SCREEN 1: COUNTDOWN ─────────────────────────────────── */
+.countdown-phase {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.countdown-caption {
+  font-size: clamp(16px, 4.5vw, 22px);
+  font-weight: 300;
+  color: var(--col-light);
+  opacity: 0.9;
+  font-style: italic;
+  letter-spacing: 0.02em;
+}
+
+.countdown-grid {
+  display: flex;
+  align-items: center;
+  gap: clamp(6px, 2vw, 16px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Glassmorphism countdown cards */
+.countdown-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(111, 45, 189, 0.18);
+  border: 1.5px solid rgba(166, 99, 204, 0.45);
+  border-radius: var(--radius-card);
+  padding: clamp(14px, 4vw, 22px) clamp(16px, 5vw, 28px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: var(--glow-soft), inset 0 1px 0 rgba(255,255,255,0.1);
+  min-width: clamp(62px, 18vw, 88px);
+  transition: box-shadow var(--transition-fast);
+}
+
+.countdown-card:hover {
+  box-shadow: var(--glow-primary);
+}
+
+.countdown-value {
+  font-family: var(--font-body);
+  font-size: clamp(28px, 8vw, 48px);
+  font-weight: 700;
+  color: var(--col-light);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-shadow: var(--glow-primary);
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: center;
+}
+
+.countdown-label {
+  font-size: clamp(9px, 2.5vw, 12px);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--col-secondary);
+  font-weight: 500;
+}
+
+.countdown-sep {
+  font-size: clamp(24px, 7vw, 40px);
+  font-weight: 700;
+  color: var(--col-secondary);
+  line-height: 1;
+  opacity: 0.8;
+  /* hide on very small */
+  display: block;
+  animation: sepBlink 1s step-end infinite;
+}
+
+@keyframes sepBlink {
+  0%, 100% { opacity: 0.8; }
+  50%       { opacity: 0.2; }
+}
+
+.countdown-sub {
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: rgba(251, 251, 251, 0.55);
+  font-weight: 300;
+}
+
+/* ── 8. SCREEN 2: BIRTHDAY ──────────────────────────────────── */
+.screen--birthday {
+  background: radial-gradient(ellipse at 30% 70%, #6F2DBD 0%, #171123 60%);
+}
+
+.bday-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.bday-cake {
+  font-size: clamp(56px, 18vw, 90px);
+  animation: cakeBounce 2s ease-in-out infinite;
+  will-change: transform;
+}
+
+@keyframes cakeBounce {
+  0%, 100% { transform: translateY(0) rotate(-3deg); }
+  50%       { transform: translateY(-12px) rotate(3deg); }
+}
+
+.bday-heading {
+  font-family: var(--font-head);
+  font-size: clamp(28px, 9vw, 52px);
+  font-weight: 700;
+  color: var(--col-light);
+  line-height: 1.2;
+  text-shadow: var(--glow-primary);
+  animation: headingGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes headingGlow {
+  from { text-shadow: 0 0 20px rgba(111,45,189,0.8), 0 0 40px rgba(111,45,189,0.4); }
+  to   { text-shadow: 0 0 30px rgba(166,99,204,0.9), 0 0 60px rgba(166,99,204,0.5); }
+}
+
+.bday-sub {
+  font-size: clamp(14px, 4vw, 18px);
+  font-weight: 300;
+  color: rgba(251, 251, 251, 0.85);
+  letter-spacing: 0.03em;
+}
+
+/* ── 9. BALLOONS ────────────────────────────────────────────── */
+.balloons-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.balloon {
+  position: absolute;
+  bottom: -120px;
+  font-size: clamp(28px, 8vw, 48px);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: balloonRise linear infinite;
+}
+
+@keyframes balloonRise {
+  0%   { transform: translateY(0) translateX(0) scale(0.8);   opacity: 0; }
+  5%   { opacity: 1; }
+  50%  { transform: translateY(-55vh) translateX(20px) scale(1); }
+  95%  { opacity: 0.7; }
+  100% { transform: translateY(-110vh) translateX(-20px) scale(0.9); opacity: 0; }
+}
+
+/* ── 10. BUTTONS ────────────────────────────────────────────── */
+.btn {
+  min-height: 52px;
+  padding: 14px 32px;
+  border: none;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-body);
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  letter-spacing: 0.02em;
+}
+
+.btn:active {
+  transform: scale(0.96) !important;
+}
+
+.btn--primary {
+  background: var(--gradient-main);
+  color: var(--col-light);
+  box-shadow: var(--glow-soft), 0 4px 20px rgba(111, 45, 189, 0.5);
+}
+
+.btn--primary:hover,
+.btn--primary:focus-visible {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--glow-primary), 0 8px 28px rgba(111, 45, 189, 0.6);
+  outline: none;
+}
+
+/* Love screen buttons */
+.love-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.btn--love {
+  flex: 1;
+  min-width: 130px;
+  max-width: 200px;
+  min-height: 58px;
+  background: rgba(111, 45, 189, 0.2);
+  border: 2px solid var(--col-secondary);
+  color: var(--col-light);
+  font-size: clamp(15px, 4.5vw, 18px);
+  font-weight: 700;
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: var(--glow-soft);
+  transition: transform var(--transition-spring), box-shadow var(--transition-fast), background var(--transition-fast);
+}
+
+.btn--love:hover,
+.btn--love:focus-visible {
+  transform: translateY(-4px) scale(1.05);
+  background: rgba(111, 45, 189, 0.45);
+  box-shadow: var(--glow-primary);
+  outline: none;
+}
+
+/* ── 11. SCREEN 3: LOVE ─────────────────────────────────────── */
+.screen--love {
+  background: radial-gradient(ellipse at 70% 30%, #6F2DBD 0%, #171123 65%);
+}
+
+.love-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  width: 100%;
+  max-width: 420px;
+}
+
+.love-emoji {
+  font-size: clamp(52px, 16vw, 80px);
+  animation: loveEmojiWiggle 2s ease-in-out infinite;
+}
+
+@keyframes loveEmojiWiggle {
+  0%, 100% { transform: rotate(-5deg) scale(1); }
+  50%       { transform: rotate(5deg) scale(1.08); }
+}
+
+.love-heading {
+  font-family: var(--font-head);
+  font-size: clamp(30px, 9vw, 50px);
+  font-weight: 700;
+  color: var(--col-light);
+  text-shadow: var(--glow-primary);
+}
+
+.love-cheeky {
+  font-size: clamp(12px, 3.5vw, 15px);
+  color: rgba(251, 251, 251, 0.6);
+  font-weight: 300;
+  font-style: italic;
+  margin-top: -8px;
+}
+
+/* Scroll hint */
+.scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: clamp(12px, 3.5vw, 14px);
+  color: var(--col-secondary);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  padding: 10px;
+  margin-top: 12px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--transition-fast);
+}
+
+.scroll-hint:hover {
+  transform: translateY(3px);
+}
+
+.scroll-hint.hidden { display: none !important; }
+
+.scroll-arrow {
+  font-size: 26px;
+  animation: scrollPulse 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px var(--col-primary));
+}
+
+@keyframes scrollPulse {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50%       { transform: translateY(8px); opacity: 1; }
+}
+
+/* ── 12. LOVE OVERLAY / POPUP ───────────────────────────────── */
+.love-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 17, 35, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: overlayIn 0.4s ease forwards;
+}
+
+.love-overlay.hidden {
+  display: none !important;
+}
+
+@keyframes overlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.love-popup {
+  background: var(--gradient-card);
+  border: 1.5px solid rgba(166, 99, 204, 0.5);
+  border-radius: 28px;
+  padding: clamp(28px, 8vw, 44px) clamp(24px, 7vw, 40px);
+  text-align: center;
+  position: relative;
+  max-width: 360px;
+  width: 100%;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--glow-primary), 0 20px 60px rgba(0,0,0,0.4);
+  animation: popupSpring 0.6s var(--transition-spring) forwards;
+}
+
+@keyframes popupSpring {
+  from { opacity: 0; transform: scale(0.6) translateY(30px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.love-popup-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.popup-heart {
+  position: absolute;
+  font-size: clamp(14px, 4vw, 22px);
+  animation: popupHeartFloat 2.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes popupHeartFloat {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(1.2); opacity: 0; }
+}
+
+.love-popup-text {
+  font-family: var(--font-head);
+  font-size: clamp(24px, 7vw, 36px);
+  font-weight: 700;
+  color: var(--col-light);
+  text-shadow: var(--glow-primary);
+  margin-bottom: 24px;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+
+.love-popup-close {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── 13. SCREEN 4: VIDEOS ───────────────────────────────────── */
+.screen--videos {
+  background: linear-gradient(180deg, #171123 0%, #1e1230 100%);
+  justify-content: flex-start;
+  padding-top: clamp(32px, 8vw, 56px);
+  padding-bottom: clamp(32px, 8vw, 56px);
+  min-height: 100dvh;
+  height: auto; /* allow natural scroll */
+}
+
+.videos-header {
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.videos-heading {
+  font-family: var(--font-head);
+  font-size: clamp(26px, 7vw, 40px);
+  font-weight: 700;
+  color: var(--col-light);
+  text-shadow: var(--glow-primary);
+  margin-bottom: 8px;
+}
+
+.videos-sub {
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: rgba(251, 251, 251, 0.65);
+  font-weight: 300;
+}
+
+.video-cards {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 6vw, 36px);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Individual video card */
+.video-card {
+  background: var(--gradient-card);
+  border: 1.5px solid rgba(166, 99, 204, 0.35);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--glow-soft), 0 8px 32px rgba(0,0,0,0.3);
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.6s ease, transform 0.6s ease, box-shadow 0.3s ease;
+}
+
+.video-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.video-card:hover {
+  box-shadow: var(--glow-primary), 0 12px 40px rgba(0,0,0,0.4);
+}
+
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #0a080f;
+  cursor: pointer;
+}
+
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+}
+
+/* Custom play button overlay */
+.play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(23, 17, 35, 0.45);
+  transition: opacity var(--transition-fast);
+  border-radius: 0;
+}
+
+.play-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.play-btn-circle {
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: rgba(111, 45, 189, 0.85);
+  border: 2.5px solid rgba(166, 99, 204, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-primary);
+  transition: transform var(--transition-spring), box-shadow var(--transition-fast);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.play-btn-circle:hover,
+.play-wrapper:hover .play-btn-circle {
+  transform: scale(1.12);
+  box-shadow: 0 0 32px rgba(111,45,189,0.9), 0 0 70px rgba(111,45,189,0.4);
+}
+
+.play-icon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 13px 0 13px 22px;
+  border-color: transparent transparent transparent var(--col-light);
+  margin-left: 4px;
+}
+
+.video-caption {
+  padding: 14px 18px;
+  font-size: clamp(13px, 3.5vw, 15px);
+  font-weight: 400;
+  color: rgba(251, 251, 251, 0.85);
+  line-height: 1.45;
+  border-top: 1px solid rgba(166, 99, 204, 0.2);
+}
+
+/* ── 14. FINAL SCREEN ───────────────────────────────────────── */
+.screen--final {
+  background: var(--gradient-radial);
+  text-align: center;
+  min-height: 100dvh;
+}
+
+.final-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.final-emoji {
+  font-size: clamp(52px, 16vw, 80px);
+  animation: finalEmojiSpin 4s ease-in-out infinite;
+}
+
+@keyframes finalEmojiSpin {
+  0%   { transform: rotate(-5deg) scale(1); }
+  25%  { transform: rotate(5deg) scale(1.1); }
+  50%  { transform: rotate(-3deg) scale(1); }
+  75%  { transform: rotate(4deg) scale(1.05); }
+  100% { transform: rotate(-5deg) scale(1); }
+}
+
+.final-heading {
+  font-family: var(--font-head);
+  font-size: clamp(28px, 9vw, 50px);
+  font-weight: 700;
+  color: var(--col-light);
+  text-shadow: var(--glow-primary);
+  line-height: 1.2;
+}
+
+.final-sub {
+  font-size: clamp(16px, 5vw, 22px);
+  font-weight: 500;
+  color: var(--col-secondary);
+}
+
+.final-love {
+  font-size: clamp(13px, 3.5vw, 16px);
+  color: rgba(251, 251, 251, 0.65);
+  font-weight: 300;
+  font-style: italic;
+}
+
+/* ── 15. SCROLL BETWEEN SCREENS ─────────────────────────────── */
+/* The non-locked screens (videos + final) allow natural scroll. */
+
+/* ── 16. UTILITY: HIDDEN ────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── 17. RESPONSIVE TWEAKS ──────────────────────────────────── */
+@media (max-width: 360px) {
+  .countdown-grid {
+    gap: 4px;
+  }
+  .countdown-card {
+    min-width: 56px;
+    padding: 12px 12px;
+  }
+  .countdown-value {
+    font-size: 24px;
+  }
+  .love-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  .btn--love {
+    max-width: 90%;
+    width: 90%;
+  }
+}
+
+@media (min-width: 430px) {
+  .video-cards {
+    padding: 0 8px;
+  }
+}
